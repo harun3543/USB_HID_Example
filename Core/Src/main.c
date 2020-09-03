@@ -259,6 +259,7 @@ void StartDefaultTask(void const * argument)
   /* Infinite loop */
   for(;;)
   {
+	printf("Hoşgeldiniz");
     osDelay(1);
   }
   /* USER CODE END 5 */
