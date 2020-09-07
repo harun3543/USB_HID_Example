@@ -24,7 +24,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "usbh_hid.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -56,12 +56,36 @@ static void MX_USART3_UART_Init(void);
 void StartDefaultTask(void const * argument);
 
 /* USER CODE BEGIN PFP */
-
+char Uart_Buff[100];
+char Char_Buff[100];
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+void USBH_HID_EventCallback(USBH_HandleTypeDef *phost)
+{
+	static int i=0;
+	if (USBH_HID_GetDeviceType(phost) == HID_KEYBOARD) {
 
+		HID_KEYBD_Info_TypeDef *Keybord_Info;
+		Keybord_Info = USBH_HID_GetKeybdInfo(phost);
+//		int keys = Keybord_Info->keys;
+//		int lctrl = Keybord_Info->lctrl;
+//		int lalt = Keybord_Info->lalt;
+		char key = USBH_HID_GetASCIICode(Keybord_Info);
+
+		//sprintf hem karakterleri birleştirir hem de bize kaç karakter uzulukta olduğunu geri döndürür.
+		int len = sprintf(Uart_Buff,"Key Pressed= %d,",key);
+
+		Char_Buff[i] += key;
+		i++;
+		if (i ==100) {
+			i=0;
+		}
+		HAL_UART_Transmit(&huart3, (uint8_t*)Uart_Buff, len, 1000);
+		HAL_UART_Transmit(&huart3, (uint8_t*)Char_Buff, sizeof(Char_Buff),1000);
+	}
+}
 /* USER CODE END 0 */
 
 /**
@@ -259,7 +283,7 @@ void StartDefaultTask(void const * argument)
   /* Infinite loop */
   for(;;)
   {
-	printf("Hoşgeldiniz");
+
     osDelay(1);
   }
   /* USER CODE END 5 */
